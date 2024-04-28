@@ -13,12 +13,12 @@ import (
 )
 
 type User struct {
-	Email     string `json:"email"`
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
+	Email     string `json:"email" dynamodbav:"email"`
+	FirstName string `json:"firstName" dynamodbav:"firstName"`
+	LastName  string `json:"lastName" dynamodbav:"lastName"`
 }
 
-var (
+const (
 	ErrorFailedFetch        = "failed to fetch record"
 	ErrorFailedUnmarshal    = "failed to unmarshal record"
 	ErrorFailedFetchAll     = "failed to fetch all table"
@@ -49,7 +49,12 @@ func FetchUser(email string, db *dynamodb.Client, tableName string) (*User, erro
 		return nil, errors.New(ErrorFailedFetch)
 	}
 
+	if len(result.Item) <= 0 {
+		return nil, nil
+	}
+
 	user := &User{}
+
 	err = attributevalue.UnmarshalMap(result.Item, user)
 	if err != nil {
 		return nil, errors.New(ErrorFailedUnmarshal)
@@ -68,7 +73,7 @@ func FetchUsers(db *dynamodb.Client, tableName string) ([]*User, error) {
 
 	users := make([]*User, 0)
 
-	err = attributevalue.UnmarshalListOfMaps(result.Items, users)
+	err = attributevalue.UnmarshalListOfMaps(result.Items, &users)
 	if err != nil {
 		return nil, errors.New(ErrorFailedUnmarshalAll)
 	}
@@ -131,7 +136,6 @@ func UpdateUser(req events.APIGatewayProxyRequest, db *dynamodb.Client, tableNam
 	if err != nil {
 		return nil, errors.New(ErrorFailedUpdateItem)
 	}
-
 	return &u, nil
 }
 

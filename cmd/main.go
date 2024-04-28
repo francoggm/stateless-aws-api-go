@@ -18,7 +18,7 @@ const (
 var svc *dynamodb.Client
 
 func main() {
-	region := "us-east-1" //os.Getenv("AWS_REGION")
+	region := "us-east-2" //os.Getenv("AWS_REGION")
 	cfg, err := config.LoadDefaultConfig(context.Background(), config.WithRegion(region))
 	if err != nil {
 		log.Panic(err)

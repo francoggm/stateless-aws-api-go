@@ -24,6 +24,11 @@ func GetUser(req events.APIGatewayProxyRequest, db *dynamodb.Client, tableName s
 				ErrorMsg: aws.String(err.Error()),
 			})
 		}
+
+		if result == nil {
+			return apiResponse(http.StatusNotFound, nil)
+		}
+
 		return apiResponse(http.StatusOK, result)
 	}
 
@@ -60,6 +65,9 @@ func UpdateUser(req events.APIGatewayProxyRequest, db *dynamodb.Client, tableNam
 
 func DeleteUser(req events.APIGatewayProxyRequest, db *dynamodb.Client, tableName string) (*events.APIGatewayProxyResponse, error) {
 	email := req.QueryStringParameters["email"]
+	if len(email) <= 0 {
+		return apiResponse(http.StatusNotFound, nil)
+	}
 
 	err := user.DeleteUser(email, db, tableName)
 	if err != nil {
