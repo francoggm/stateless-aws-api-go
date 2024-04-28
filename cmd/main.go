@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	tableName = "LambdaInGoUser"
+	tableName = "serverless-users"
 )
 
 var svc *dynamodb.Client
@@ -38,7 +38,7 @@ func handler(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse
 		return handlers.UpdateUser(req, svc, tableName)
 	case "DELETE":
 		return handlers.DeleteUser(req, svc, tableName)
+	default:
+		return handlers.UnhandleMethod()
 	}
-
-	return handlers.UnhandleMethod(req)
 }
